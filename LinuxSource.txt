@@ -3272,8 +3272,8 @@ function Linux.Create(config)
             
             local function createColorPickerDialog()
                 local isMobile = Linux.DeviceType == "Mobile"
-                local dialogWidth = isMobile and 280 or 340
-                local dialogHeight = isMobile and 320 or 380
+                local dialogWidth = isMobile and 280 or 320
+                local dialogHeight = isMobile and 280 or 300
                 
                 local ColorOverlay = Linux.Instance("Frame", {
                     Parent = Main,
@@ -3336,8 +3336,8 @@ function Linux.Create(config)
                 local ColorArea = Linux.Instance("Frame", {
                     Parent = DialogFrame,
                     BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-                    Size = UDim2.new(0, dialogWidth - 40, 0, isMobile and 150 or 180),
-                    Position = UDim2.new(0, 20, 0, 50),
+                    Size = UDim2.new(1, -30, 0, isMobile and 140 or 160),
+                    Position = UDim2.new(0, 15, 0, 45),
                     ZIndex = 1002,
                     BorderSizePixel = 1,
                     BorderColor3 = Color3.fromRGB(60, 60, 70)
@@ -3369,58 +3369,6 @@ function Linux.Create(config)
                 Linux.Instance("UICorner", {
                     Parent = ColorCursor,
                     CornerRadius = UDim.new(1, 0)
-                })
-                
-                local HueBar = Linux.Instance("Frame", {
-                    Parent = DialogFrame,
-                    BackgroundColor3 = Color3.fromRGB(255, 0, 0),
-                    Size = UDim2.new(0, 20, 0, isMobile and 150 or 180),
-                    Position = UDim2.new(1, -35, 0, 50),
-                    ZIndex = 1002,
-                    BorderSizePixel = 1,
-                    BorderColor3 = Color3.fromRGB(60, 60, 70)
-                })
-                
-                Linux.Instance("UICorner", {
-                    Parent = HueBar,
-                    CornerRadius = UDim.new(0, 4)
-                })
-                
-                local HueGradient = Linux.Instance("UIGradient", {
-                    Parent = HueBar,
-                    Color = ColorSequence.new({
-                        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
-                        ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255, 255, 0)),
-                        ColorSequenceKeypoint.new(0.33, Color3.fromRGB(0, 255, 0)),
-                        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 255)),
-                        ColorSequenceKeypoint.new(0.67, Color3.fromRGB(0, 0, 255)),
-                        ColorSequenceKeypoint.new(0.83, Color3.fromRGB(255, 0, 255)),
-                        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0))
-                    }),
-                    Rotation = 90
-                })
-                
-                local HueButton = Linux.Instance("TextButton", {
-                    Parent = HueBar,
-                    BackgroundTransparency = 1,
-                    Size = UDim2.new(1, 0, 1, 0),
-                    Text = "",
-                    ZIndex = 1003
-                })
-                
-                local HueCursor = Linux.Instance("Frame", {
-                    Parent = HueBar,
-                    BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-                    Size = UDim2.new(1, 4, 0, 4),
-                    Position = UDim2.new(0, -2, 0, -2),
-                    ZIndex = 1004,
-                    BorderSizePixel = 1,
-                    BorderColor3 = Color3.fromRGB(0, 0, 0)
-                })
-                
-                Linux.Instance("UICorner", {
-                    Parent = HueCursor,
-                    CornerRadius = UDim.new(0, 2)
                 })
                 
                 local function HSVToRGB(h, s, v)
@@ -3542,11 +3490,6 @@ function Linux.Create(config)
                     ColorCursor.Position = UDim2.new(x, -4, y, -4)
                 end
                 
-                local function updateHueCursor()
-                    local y = currentH
-                    HueCursor.Position = UDim2.new(0, -2, y, -2)
-                end
-                
                 local RedSlider, GreenSlider, BlueSlider
                 local RedValue, GreenValue, BlueValue
                 
@@ -3599,18 +3542,19 @@ function Linux.Create(config)
                         PreviewBox.BackgroundColor3 = CurrentColor
                     end
                     
+                    ColorDisplay.BackgroundColor3 = CurrentColor
+                    spawn(function() Linux:SafeCallback(config.Callback, CurrentColor) end)
                     updateRGBSliders()
                 end
                 
                 updateColorArea()
                 updateCursorPosition()
-                updateHueCursor()
                 
                 local PreviewFrame = Linux.Instance("Frame", {
                     Parent = DialogFrame,
                     BackgroundTransparency = 1,
                     Size = UDim2.new(1, -20, 0, 40),
-                    Position = UDim2.new(0, 10, 0, isMobile and 210 or 240),
+                    Position = UDim2.new(0, 10, 0, isMobile and 190 or 210),
                     ZIndex = 1002
                 })
                 
@@ -3633,7 +3577,7 @@ function Linux.Create(config)
                 Linux.Instance("TextLabel", {
                     Parent = PreviewFrame,
                     BackgroundTransparency = 1,
-                    Size = UDim2.new(0, 60, 0, 20),
+                    Size = UDim2.new(0, 100, 0, 20),
                     Position = UDim2.new(0, 70, 0, 10),
                     Font = Enum.Font.GothamSemibold,
                     Text = "RGB Values",
@@ -3643,7 +3587,8 @@ function Linux.Create(config)
                     ZIndex = 1002
                 })
                 
-                local function createRGBSlider(colorName, position, color, value)
+                local accentColor = Linux.Themes[Linux.CurrentTheme]
+                local function createRGBSlider(colorName, position, value)
                     local SliderFrame = Linux.Instance("Frame", {
                         Parent = DialogFrame,
                         BackgroundTransparency = 1,
@@ -3710,7 +3655,7 @@ function Linux.Create(config)
                     
                     local SliderFill = Linux.Instance("Frame", {
                         Parent = SliderTrack,
-                        BackgroundColor3 = color,
+                        BackgroundColor3 = accentColor,
                         Size = UDim2.new(value / 255, 0, 1, 0),
                         ZIndex = 1002,
                         BorderSizePixel = 0,
@@ -3775,8 +3720,9 @@ function Linux.Create(config)
                             currentH, currentS, currentV = RGBToHSV(CurrentColor.R, CurrentColor.G, CurrentColor.B)
                             updateColorArea()
                             updateCursorPosition()
-                            updateHueCursor()
                             PreviewBox.BackgroundColor3 = CurrentColor
+                            ColorDisplay.BackgroundColor3 = CurrentColor
+                            spawn(function() Linux:SafeCallback(config.Callback, CurrentColor) end)
                         end
                     end)
                     
@@ -3795,8 +3741,9 @@ function Linux.Create(config)
                             currentH, currentS, currentV = RGBToHSV(CurrentColor.R, CurrentColor.G, CurrentColor.B)
                             updateColorArea()
                             updateCursorPosition()
-                            updateHueCursor()
                             PreviewBox.BackgroundColor3 = CurrentColor
+                            ColorDisplay.BackgroundColor3 = CurrentColor
+                            spawn(function() Linux:SafeCallback(config.Callback, CurrentColor) end)
                         end
                     end)
                     
@@ -3809,12 +3756,11 @@ function Linux.Create(config)
                     return SliderTrack, ValueText
                 end
                 
-                RedSlider, RedValue = createRGBSlider("R", UDim2.new(0, 15, 0, isMobile and 260 or 290), Color3.fromRGB(255, 100, 100), math.floor(CurrentColor.R * 255))
-                GreenSlider, GreenValue = createRGBSlider("G", UDim2.new(0, 15, 0, isMobile and 285 or 315), Color3.fromRGB(100, 255, 100), math.floor(CurrentColor.G * 255))
-                BlueSlider, BlueValue = createRGBSlider("B", UDim2.new(0, 15, 0, isMobile and 310 or 340), Color3.fromRGB(100, 100, 255), math.floor(CurrentColor.B * 255))
+                RedSlider, RedValue = createRGBSlider("R", UDim2.new(0, 15, 0, isMobile and 235 or 255), math.floor(CurrentColor.R * 255))
+                GreenSlider, GreenValue = createRGBSlider("G", UDim2.new(0, 15, 0, isMobile and 255 or 275), math.floor(CurrentColor.G * 255))
+                BlueSlider, BlueValue = createRGBSlider("B", UDim2.new(0, 15, 0, isMobile and 275 or 295), math.floor(CurrentColor.B * 255))
                 
                 local isDraggingColor = false
-                local isDraggingHue = false
                 
                 ColorAreaButton.InputBegan:Connect(function(input)
                     if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -3849,53 +3795,6 @@ function Linux.Create(config)
                     end
                 end)
                 
-                HueButton.InputBegan:Connect(function(input)
-                    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
-                        isDraggingHue = true
-                        local relativeY = math.clamp((input.Position.Y - HueBar.AbsolutePosition.Y) / HueBar.AbsoluteSize.Y, 0, 1)
-                        
-                        currentH = relativeY
-                        
-                        updateColorArea()
-                        updateCurrentColor()
-                        updateHueCursor()
-                    end
-                end)
-                
-                HueButton.InputChanged:Connect(function(input)
-                    if isDraggingHue and (input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseMovement) then
-                        local relativeY = math.clamp((input.Position.Y - HueBar.AbsolutePosition.Y) / HueBar.AbsoluteSize.Y, 0, 1)
-                        
-                        currentH = relativeY
-                        
-                        updateColorArea()
-                        updateCurrentColor()
-                        updateHueCursor()
-                    end
-                end)
-                
-                HueButton.InputEnded:Connect(function(input)
-                    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
-                        isDraggingHue = false
-                    end
-                end)
-                
-                local ButtonsFrame = Linux.Instance("Frame", {
-                    Parent = DialogFrame,
-                    BackgroundTransparency = 1,
-                    Size = UDim2.new(1, -20, 0, 30),
-                    Position = UDim2.new(0, 10, 1, -40),
-                    ZIndex = 1002
-                })
-                
-                Linux.Instance("UIListLayout", {
-                    Parent = ButtonsFrame,
-                    FillDirection = Enum.FillDirection.Horizontal,
-                    HorizontalAlignment = Enum.HorizontalAlignment.Right,
-                    VerticalAlignment = Enum.VerticalAlignment.Center,
-                    Padding = UDim.new(0, 10)
-                })
-                
                 local function closeDialog()
                     local closeTweenOverlay = TweenService:Create(ColorOverlay, TweenInfo.new(0.15), {BackgroundTransparency = 1})
                     local closeTweenDialog = TweenService:Create(DialogFrame, TweenInfo.new(0.15), {BackgroundTransparency = 1})
@@ -3913,78 +3812,6 @@ function Linux.Create(config)
                     ColorOverlay:Destroy()
                 end
                 
-                local ConfirmButton = Linux.Instance("TextButton", {
-                    Parent = ButtonsFrame,
-                    BackgroundColor3 = Linux.Themes[Linux.CurrentTheme],
-                    BorderSizePixel = 0,
-                    Size = UDim2.new(0, 70, 0, 25),
-                    Font = Enum.Font.GothamSemibold,
-                    Text = "Apply",
-                    TextColor3 = Color3.fromRGB(255, 255, 255),
-                    TextSize = 12,
-                    ZIndex = 1003,
-                    AutoButtonColor = false,
-                    Active = true
-                })
-                
-                Linux.Instance("UICorner", {
-                    Parent = ConfirmButton,
-                    CornerRadius = UDim.new(0, 4)
-                })
-                
-                local CancelButton = Linux.Instance("TextButton", {
-                    Parent = ButtonsFrame,
-                    BackgroundColor3 = Color3.fromRGB(60, 60, 70),
-                    BorderSizePixel = 0,
-                    Size = UDim2.new(0, 70, 0, 25),
-                    Font = Enum.Font.GothamSemibold,
-                    Text = "Cancel",
-                    TextColor3 = Color3.fromRGB(255, 255, 255),
-                    TextSize = 12,
-                    ZIndex = 1003,
-                    AutoButtonColor = false,
-                    Active = true
-                })
-                
-                Linux.Instance("UICorner", {
-                    Parent = CancelButton,
-                    CornerRadius = UDim.new(0, 4)
-                })
-                
-                ConfirmButton.MouseEnter:Connect(function()
-                    TweenService:Create(ConfirmButton, TweenInfo.new(0.2), {
-                        BackgroundColor3 = Color3.fromRGB(
-                            math.min(255, Linux.Themes[Linux.CurrentTheme].R * 255 + 20),
-                            math.min(255, Linux.Themes[Linux.CurrentTheme].G * 255 + 20),
-                            math.min(255, Linux.Themes[Linux.CurrentTheme].B * 255 + 20)
-                        )
-                    }):Play()
-                end)
-                
-                ConfirmButton.MouseLeave:Connect(function()
-                    TweenService:Create(ConfirmButton, TweenInfo.new(0.2), {
-                        BackgroundColor3 = Linux.Themes[Linux.CurrentTheme]
-                    }):Play()
-                end)
-                
-                CancelButton.MouseEnter:Connect(function()
-                    TweenService:Create(CancelButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(80, 80, 90)}):Play()
-                end)
-                
-                CancelButton.MouseLeave:Connect(function()
-                    TweenService:Create(CancelButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(60, 60, 70)}):Play()
-                end)
-                
-                ConfirmButton.MouseButton1Click:Connect(function()
-                    ColorDisplay.BackgroundColor3 = CurrentColor
-                    closeDialog()
-                    spawn(function() Linux:SafeCallback(config.Callback, CurrentColor) end)
-                end)
-                
-                CancelButton.MouseButton1Click:Connect(function()
-                    closeDialog()
-                end)
-                
                 ColorOverlay.MouseButton1Click:Connect(function()
                     closeDialog()
                 end)
@@ -3995,9 +3822,6 @@ function Linux.Create(config)
                     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
                         if isDraggingColor then
                             isDraggingColor = false
-                        end
-                        if isDraggingHue then
-                            isDraggingHue = false
                         end
                     end
                 end)
